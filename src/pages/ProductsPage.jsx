@@ -1,27 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { useProducts } from "../context/ProductContext";
-import Card from "../components/Card";
+import { useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import styles from "./ProductsPage.module.css";
+import SearchBox from "../components/SearchBox";
+import Sidebar from "../components/Sidebar";
+import Card from "../components/Card";
 import Loader from "../components/Loader";
+import { fetchProducts } from "../features/product/productSlice";
 
 import {
   filterProducts,
   getInitialQuery,
   seachProducts,
 } from "../helpers/helper";
-import { useSearchParams } from "react-router-dom";
-import SearchBox from "../components/SearchBox";
-import Sidebar from "../components/Sidebar";
+
+import styles from "./ProductsPage.module.css";
 
 function ProductsPage() {
-  const products = useProducts();
+  const dispach = useDispatch();
+  const { products, loading } = useSelector((store) => store.product);
+  // console.log(state);
+
+  // const products = useProducts();
+  // const products = [];
 
   const [search, setSearch] = useState("");
   const [displayde, setDisplayde] = useState([]);
   const [query, setQuery] = useState({});
 
   const [searchParams, setSearchparams] = useSearchParams();
+
+  useEffect(() => {
+    dispach(fetchProducts());
+  }, []);
 
   useEffect(() => {
     setDisplayde(products);
@@ -40,11 +51,11 @@ function ProductsPage() {
 
   return (
     <>
-      <SearchBox search={search} setSearch={setSearch} setQuery={setQuery}/>
+      <SearchBox search={search} setSearch={setSearch} setQuery={setQuery} />
       <div className={styles.container}>
         <div className={styles.products}>
-          {!displayde.length && <Loader />}
-          {displayde.map((p) => (
+          {loading && <Loader />}
+          {!!displayde.length && displayde.map((p) => (
             <Card key={p.id} data={p} />
           ))}
         </div>

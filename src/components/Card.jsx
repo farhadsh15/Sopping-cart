@@ -1,23 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { TbListDetails, TbShoppingBagCheck } from "react-icons/tb";
 
 import { productQuantity, shortenText } from "../helpers/helper";
 
 import styles from "./Card.module.css";
-import { useCart } from "../context/CartContext";
 import { MdDeleteOutline } from "react-icons/md";
+import { addItem, decrease, increase, removeItem } from "../features/cart/cartSlice";
 
 function Card({ data }) {
   const { id, image, title, price } = data;
-  const [state, despatch] = useCart();
-
+  const state = useSelector((store) => store.cart)
+  const despatch = useDispatch()
   const quantity = productQuantity(state, id);
-  console.log(quantity);
 
-  const clickHandler = (type) => {
-    despatch({ type: type, payload: data });
-  };
   return (
     <div className={styles.card}>
       <img src={image} alt={title} />
@@ -29,21 +26,21 @@ function Card({ data }) {
         </Link>
         <div>
           {quantity === 1 ? (
-            <button onClick={() => clickHandler("REMOVE_ITEM")}>
+            <button onClick={() => despatch(removeItem(data))}>
               <MdDeleteOutline />
             </button>
           ) : (
             quantity > 1 && (
-              <button onClick={() => clickHandler("DECREASE")}>-</button>
+              <button onClick={() => despatch(decrease(data))}>-</button>
             )
           )}
           {quantity !== 0 && <span>{quantity}</span>}
           {quantity === 0 ? (
-            <button onClick={() => clickHandler("ADD_ITEM")}>
+            <button onClick={() => despatch(addItem(data))}>
               <TbShoppingBagCheck />
             </button>
           ) : (
-            <button onClick={() => clickHandler("INCREASE")}>+</button>
+            <button onClick={() => despatch(increase(data))}>+</button>
           )}
         </div>
       </div>

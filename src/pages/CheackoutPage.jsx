@@ -1,39 +1,40 @@
-import React from 'react'
-import { useCart } from '../context/CartContext'
-import BasketCart from '../components/BasketCart';
+import React from "react";
+import BasketCart from "../components/BasketCart";
 
-import styles from "./CheackoutPage.module.css"
-import { TbChecklist } from 'react-icons/tb';
-import { FaHashtag } from 'react-icons/fa';
-import { BsPatchCheck } from 'react-icons/bs';
+import styles from "./CheackoutPage.module.css";
+import { TbChecklist } from "react-icons/tb";
+import { FaHashtag } from "react-icons/fa";
+import { BsPatchCheck } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { checkout as checkoutDespatch } from "../features/cart/cartSlice";
 
 function CheackoutPage() {
+  const { selectedItems, total, itemsCounter, checkout } = useSelector((store) => store.cart);
+  const despatch = useDispatch();
 
-  const [{selectedItems, total, itemsCounter, checkout}, despatch] = useCart();
+  // const [{selectedItems, total, itemsCounter, checkout}, despatch] = useCart();
 
-  const clickHandler = (type, data) => {
-    despatch({ type: type, payload: data });
-  };
-
-  if(!selectedItems.length) return (
-    <p>Empty</p>
-  )
+  if (!selectedItems.length) return <p>Empty</p>;
 
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
-        <p><TbChecklist /> Total: <span>{total}</span></p>
-        <p><FaHashtag /> Quntity: <span>{itemsCounter}</span></p>
+        <p>
+          <TbChecklist /> Total: <span>{total}</span>
+        </p>
+        <p>
+          <FaHashtag /> Quntity: <span>{itemsCounter}</span>
+        </p>
         <p><BsPatchCheck /> Status: <span>{!checkout && "pending..."}</span></p>
-        <button onClick={() => clickHandler("CHECKOUT")}>Cheackout</button>
+        <button onClick={() => despatch(checkoutDespatch())}>Cheackout</button>
       </div>
       <div className={styles.products}>
-        {
-          selectedItems.map(product => <BasketCart key={product.id} data={product} despatch={despatch} clickHandler={clickHandler} />)
-        }
+        {selectedItems.map((product) => (
+          <BasketCart key={product.id} data={product} />
+        ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default CheackoutPage
+export default CheackoutPage;
